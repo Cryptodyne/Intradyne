@@ -1,0 +1,95 @@
+trading:
+  mode: paper  # paper or live
+  initial_capital: 10000
+  symbols:
+    - BTC/USDT
+    - ETH/USDT
+  update_interval: 60  # seconds
+  position_size: 0.1  # 10% of capital per trade
+
+exchange:
+  name: bitget
+  # API keys loaded from environment variables
+  rate_limit: 10  # requests per second
+  timeout: 30  # seconds
+
+strategies:
+  ensemble:
+    enabled: true
+    method: weighted_vote  # weighted_vote, majority_vote, unanimous, performance_weighted
+    strategies:
+      - name: multi_engine
+        weight: 1.5
+        enabled: true
+      - name: ml_strategy
+        weight: 1.0
+        enabled: true
+      - name: optimized_sma
+        weight: 1.2
+        enabled: true
+
+risk_management:
+  max_positions: 5
+  max_position_size: 0.2  # 20% of capital
+  daily_loss_limit: 0.05  # 5%
+  max_drawdown: 0.15  # 15%
+  stop_loss_pct: 0.03  # 3%
+  take_profit_pct: 0.10  # 10%
+  consecutive_loss_limit: 5
+
+policy_engine:
+  enabled: true
+  preset: moderate  # conservative, moderate, aggressive
+  custom_rules:
+    trading_hours:
+      enabled: false
+      start_hour: 9
+      end_hour: 16
+
+monitoring:
+  drift_detection:
+    enabled: true
+    baseline_sharpe: 1.5
+    baseline_win_rate: 0.55
+    lookback_trades: 50
+  
+  health_metrics:
+    enabled: true
+    check_interval: 60  # seconds
+  
+  performance_tracking:
+    enabled: true
+    export_interval: 3600  # 1 hour
+
+data_retention:
+  policy: standard  # aggressive, standard, conservative
+  max_raw_samples: 1000
+  max_compressed_samples: 10000
+  compression_ratio: 20
+
+notifications:
+  email:
+    enabled: false
+    # SMTP settings from environment
+  
+  telegram:
+    enabled: false
+    # Bot token from environment
+  
+  discord:
+    enabled: false
+    # Webhook from environment
+
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: logs/intradyne.log
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+  console: true
+
+database:
+  enabled: false
+  # Connection details from environment
+  pool_size: 5
+  max_overflow: 10

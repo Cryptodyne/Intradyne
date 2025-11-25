@@ -1,0 +1,39 @@
+exchanges:
+  bitget:
+    enabled: true
+    testnet: false
+    priority: 1
+    markets:
+      - BTC/USDT
+      - ETH/USDT
+      - SOL/USDT
+      - XRP/USDT
+    rate_limit: 1000
+    
+  binance:
+    enabled: true
+    testnet: false
+    priority: 2
+    markets:
+      - BTC/USDT
+      - ETH/USDT
+      - BNB/USDT
+      - SOL/USDT
+    rate_limit: 1200
+    
+  bybit:
+    enabled: false
+    testnet: false
+    priority: 3
+    markets:
+      - BTC/USDT
+      - ETH/USDT
+    rate_limit: 120
+
+settings:
+  default_exchange: bitget
+  default_timeframe: 5m
+  default_limit: 100
+  cache_ttl: 60
+  max_retries: 3
+  retry_delay: 2

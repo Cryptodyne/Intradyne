@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intradyne-trading
+  labels:
+    app: intradyne
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: intradyne
+  template:
+    metadata:
+      labels:
+        app: intradyne
+        version: v1
+    spec:
+      containers:
+      - name: intradyne
+        image: intradyne/trading:latest
+        ports:
+        - containerPort: 8501
+          name: http
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: POSTGRES_HOST
+          value: "postgres-service"
+        envFrom:
+        - secretRef:
+            name: intradyne-secrets
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8501
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8501
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+        - name: config
+          mountPath: /app/config
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: intradyne-data-pvc
+      - name: config
+        configMap:
+          name: intradyne-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: intradyne-service
+  labels:
+    app: intradyne
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8501
+    protocol: TCP
+    name: http
+  selector:
+    app: intradyne
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: intradyne-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: intradyne-trading
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

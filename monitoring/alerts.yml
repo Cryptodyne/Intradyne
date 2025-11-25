@@ -1,0 +1,93 @@
+groups:
+  - name: trading_alerts
+    interval: 30s
+    rules:
+      # Error rate alerts
+      - alert: HighErrorRate
+        expr: rate(errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors/sec"
+      
+      # Drift detection
+      - alert: StrategyDriftDetected
+        expr: strategy_drift_detected == 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Strategy drift detected"
+          description: "Strategy performance has degraded significantly"
+      
+      # Drawdown alerts
+      - alert: HighDrawdown
+        expr: portfolio_drawdown < -0.15
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Max drawdown exceeded"
+          description: "Current drawdown: {{ $value }}%"
+      
+      # Daily loss limit
+      - alert: DailyLossLimitExceeded
+        expr: daily_pnl_pct < -0.05
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Daily loss limit exceeded"
+          description: "Daily P&L: {{ $value }}%"
+      
+      # System health
+      - alert: LowHealthScore
+        expr: system_health_score < 70
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "System health degraded"
+          description: "Health score: {{ $value }}/100"
+      
+      # Container health
+      - alert: ContainerDown
+        expr: up{job="intradyne"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Intradyne container is down"
+          description: "Container has been down for 2 minutes"
+      
+      # High latency
+      - alert: HighLatency
+        expr: avg_latency_ms > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency detected"
+          description: "Average latency: {{ $value }}ms"
+      
+      # Memory usage
+      - alert: HighMemoryUsage
+        expr: memory_usage_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage: {{ $value }}%"
+      
+      # CPU usage
+      - alert: HighCPUUsage
+        expr: cpu_usage_percent > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage: {{ $value }}%"

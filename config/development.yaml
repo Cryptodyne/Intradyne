@@ -1,0 +1,54 @@
+trading:
+  mode: paper
+  initial_capital: 5000
+  symbols:
+    - BTC/USDT
+  update_interval: 30
+  position_size: 0.05
+
+exchange:
+  name: binance
+  rate_limit: 20
+  timeout: 10
+
+strategies:
+  ensemble:
+    enabled: true
+    method: majority_vote
+    strategies:
+      - name: multi_engine
+        weight: 1.0
+        enabled: true
+
+risk_management:
+  max_positions: 3
+  max_position_size: 0.15
+  daily_loss_limit: 0.03
+  max_drawdown: 0.10
+  stop_loss_pct: 0.02
+  take_profit_pct: 0.05
+  consecutive_loss_limit: 3
+
+policy_engine:
+  enabled: true
+  preset: conservative
+
+monitoring:
+  drift_detection:
+    enabled: true
+    baseline_sharpe: 1.0
+    baseline_win_rate: 0.50
+  
+  health_metrics:
+    enabled: true
+    check_interval: 30
+
+data_retention:
+  policy: aggressive
+  max_raw_samples: 500
+  max_compressed_samples: 5000
+
+logging:
+  level: DEBUG
+  console: true
+  file: logs/intradyne-dev.log
