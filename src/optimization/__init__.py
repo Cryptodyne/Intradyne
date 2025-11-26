@@ -1,3 +1,3 @@
-from .async_optimizer import AsyncOptimizer, PerformanceComparison
+from .optimizer import StrategyOptimizer
 
-__all__ = ['AsyncOptimizer', 'PerformanceComparison']
+__all__ = ['StrategyOptimizer']

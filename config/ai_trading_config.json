@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "trading_mode": "Hybrid",
+  "risk_preference": "Moderate",
+  "stop_loss_pct": 3.0,
+  "take_profit_pct": 8.0,
+  "trailing_stop_pct": 2.5,
+  "max_position_size": 500.0,
+  "momentum_weight": 70,
+  "sentiment_weight": 30,
+  "confidence_threshold": 75,
+  "buy_threshold": 0.6,
+  "sell_threshold": 0.4,
+  "min_hold_time_minutes": 30,
+  "use_technical_indicators": true,
+  "rsi_overbought": 70,
+  "rsi_oversold": 30,
+  "min_volume_ratio": 1.2
+}

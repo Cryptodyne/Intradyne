@@ -19,24 +19,32 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual Environment
 venv/
-.venv/
 env/
+ENV/
 .env
 
 # IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # Project Specific
+certs/
+*.pem
+*.key
+*.crt
+orders/active_orders.json
+data/logs/
 logs/
-data/
 *.log
-*.sqlite
-*.db
+.gemini/
+tmp/
 
 # OS
-.DS_Store
 Thumbs.db
+Desktop.ini

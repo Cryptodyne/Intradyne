@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # INTRADYNE v1.1
 
 ## System Status
@@ -35,3 +36,6 @@
 - `src/engines/`: The 7 Hybrid Engines.
 - `src/interface/`: Next.js Web Dashboard.
 - `data/`: Logs and Vector Store.
+=======
+# Intradyne
+>>>>>>> 04032a5c57bb532952f0188a1558d0b5e54a0a44

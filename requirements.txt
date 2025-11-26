@@ -1,45 +1,59 @@
-numpy
-pandas
-fastapi
-uvicorn
+# Core Dependencies
 numpy>=1.24.0
 pandas>=2.0.0
-fastapi
-uvicorn
+python-dotenv
+pyyaml
+
+# Trading & Exchange APIs
+ccxt
+
+# Web Frameworks
+streamlit
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# Database & ORM
+sqlalchemy>=2.0.0
 pydantic
-sqlalchemy
-numpy
-pandas
-fastapi
-uvicorn
-numpy>=1.24.0
-pandas>=2.0.0
-fastapi
-uvicorn
-pydantic
-sqlalchemy
+
+# Real-Time & WebSocket
+websockets>=12.0
+python-socketio>=5.10.0
+aiofiles>=23.0.0
+
+# API Rate Limiting
+slowapi>=0.1.9
+
+# File Monitoring
+watchdog>=3.0.0
+
+# ML & AI
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+joblib>=1.3.0
+
+# RAG & Vector DB
 chromadb>=0.4.0
 langchain
 langchain-community
 sentence-transformers>=2.2.0
+
+# HTTP Clients
 python-multipart
-websockets
-reportlab
-# Core
-pandas
-numpy
-ccxt
-streamlit
+requests
+httpx
 
-# ML
-scikit-learn
-xgboost
-joblib
-
-# Utilities
-python-dotenv
-pyyaml
+# Security & Crypto
 cryptography>=6.0
-scikit-learn>=1.3.0
-xgboost>=2.0.0
-joblib>=1.3.0
+pyjwt>=2.8.0
+
+# Reporting
+reportlab
+
+# Data Visualization (for reporting)
+plotly
+
+# Development & Testing
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+pytest-cov>=4.1.0

@@ -1,0 +1,28 @@
+{
+  "refresh_interval": 5,
+  "performance_mode": "auto",
+  "websocket": {
+    "enabled": true,
+    "url": "ws://localhost:8000/ws/trading-stream",
+    "timeout": 10,
+    "reconnect_attempts": 5,
+    "reconnect_delay": 2
+  },
+  "cache": {
+    "price_ttl": 5,
+    "trade_ttl": 10,
+    "signal_ttl": 30,
+    "max_trades_memory": 200
+  },
+  "data_sources": {
+    "primary": "api",
+    "fallback_1": "file",
+    "fallback_2": "none"
+  },
+  "features": {
+    "auto_refresh": true,
+    "animated_updates": true,
+    "sound_alerts": false,
+    "desktop_notifications": false
+  }
+}
