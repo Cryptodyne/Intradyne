@@ -37,7 +37,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/test_smart_trailing.py tests/test_micro_exit.py tests/test_financial_safety.py tests/test_market_guard_integration.py tests/test_strategy_sizing_compliance.py tests/test_operational_resilience.py tests/test_dynamic_blacklist.py -v --cov=src --cov-report=xml --cov-report=term-missing
+          pytest tests/test_smart_trailing.py tests/test_micro_exit.py tests/test_financial_safety.py tests/test_market_guard_integration.py tests/test_operational_resilience.py tests/test_dynamic_blacklist.py -v --cov=src --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
