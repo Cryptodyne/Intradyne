@@ -2,6 +2,7 @@ import sys
 import os
 import time
 import logging
+import pandas as pd
 
 # Ensure root directory is on Python path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
@@ -107,48 +108,66 @@ def run_paper_trading():
                         'volume': vol
                     })
 
-        # Pre-filter top 70 by liquidity/24h volume for fast 4h momentum calculation
+        # Sort candidates by quote volume first (Stage 0: Liquidity Filter)
         candidates.sort(key=lambda x: x['volume'], reverse=True)
-        top_candidates = candidates[:70]
+        top_50_candidates = candidates[:50]
 
-        valid_pairs = []
-        logger.info(f"Computing 4h Session Momentum across top {len(top_candidates)} liquidity candidates...")
-        for c in top_candidates:
+        # Stage 1: 4H Macro Bias Filter (Top 50 -> Top 25)
+        logger.info(f"🏆 Stage 1: Evaluating 4H Macro Bias across Top {len(top_50_candidates)} Halal candidates...")
+        stage1_passed = []
+        for c in top_50_candidates:
             symbol = c['symbol']
             try:
-                ohlcv = trader.market_data_fetcher.fetch_ohlcv(symbol, timeframe='15m', limit=17)
-                if ohlcv and len(ohlcv) >= 16:
-                    open_4h = ohlcv[-16][1] # Open price 16 candles ago (4 hours)
-                    close_now = ohlcv[-1][4]
-                    if open_4h > 0:
-                        perc_4h = ((close_now - open_4h) / open_4h) * 100
-                        valid_pairs.append({
-                            'symbol': symbol,
-                            'momentum_4h': perc_4h,
-                            'volume': c['volume']
-                        })
-                        continue
+                ohlcv_4h = trader.market_data_fetcher.fetch_ohlcv(symbol, timeframe='4h', limit=30)
+                if ohlcv_4h and len(ohlcv_4h) >= 20:
+                    df_4h = pd.DataFrame(ohlcv_4h, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+                    is_bullish, score = strategy.evaluate_4h_bias(df_4h)
+                    if is_bullish:
+                        stage1_passed.append({'symbol': symbol, 'score_4h': score, 'volume': c['volume']})
             except Exception:
                 pass
-            # Fallback to 24h momentum if 4h candles unavailable
-            valid_pairs.append({
-                'symbol': symbol,
-                'momentum_4h': c['perc_24h'],
-                'volume': c['volume']
-            })
 
-        valid_pairs.sort(key=lambda x: x['momentum_4h'], reverse=True)
-        selected = valid_pairs[:top_n]
-        symbols_to_trade = [p['symbol'] for p in selected]
+        # Fallback if less than 10 pass Stage 1
+        if len(stage1_passed) < 10:
+            for c in top_50_candidates[:25]:
+                if not any(x['symbol'] == c['symbol'] for x in stage1_passed):
+                    stage1_passed.append({'symbol': c['symbol'], 'score_4h': c['perc_24h'], 'volume': c['volume']})
+
+        stage1_passed.sort(key=lambda x: x['score_4h'], reverse=True)
+        top_25 = stage1_passed[:25]
+        logger.info(f"✅ Stage 1 Complete: Filtered to Top {len(top_25)} 4H Bullish Bias coins.")
+
+        # Stage 2: 1H Trend Structure Filter (Top 25 -> Top 10)
+        logger.info(f"🏆 Stage 2: Confirming 1H Trend Structure across Top {len(top_25)} candidates...")
+        stage2_passed = []
+        for c in top_25:
+            symbol = c['symbol']
+            try:
+                ohlcv_1h = trader.market_data_fetcher.fetch_ohlcv(symbol, timeframe='1h', limit=30)
+                if ohlcv_1h and len(ohlcv_1h) >= 20:
+                    df_1h = pd.DataFrame(ohlcv_1h, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+                    is_valid, score = strategy.evaluate_1h_structure(df_1h)
+                    if is_valid:
+                        stage2_passed.append({'symbol': symbol, 'score_1h': score + c['score_4h']})
+            except Exception:
+                pass
+
+        # Fallback if less than 5 pass Stage 2
+        if len(stage2_passed) < 5:
+            for c in top_25[:10]:
+                if not any(x['symbol'] == c['symbol'] for x in stage2_passed):
+                    stage2_passed.append({'symbol': c['symbol'], 'score_1h': c['score_4h']})
+
+        stage2_passed.sort(key=lambda x: x['score_1h'], reverse=True)
+        symbols_to_trade = [p['symbol'] for p in stage2_passed[:10]]
         
-        logger.info(f"Intraday 4h Momentum Scan complete! Selected {len(symbols_to_trade)} Halal pairs for 15m trading: {symbols_to_trade[:10]}...")
+        logger.info(f"🎯 Stage 3 & 4 Active! Top 10 MTF Funnel Setups selected for 15m/5m execution: {symbols_to_trade}")
         
     except Exception as e:
         logger.error(f"Error during market scan: {e}. Falling back to default symbols.")
         symbols_to_trade = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'XRP/USD', 'ADA/USD']
 
-    logger.info("Starting Live Intraday Paper Trading (15m Candle Closes)...")
-    # Rule 10: 15m candle closes with 30s update poll interval
+    logger.info("Starting Live 4-Stage MTF Funnel Paper Trading (15m/5m Execution)...")
     trader.run_trading_loop(symbols_to_trade, 30)
 
 if __name__ == "__main__":
